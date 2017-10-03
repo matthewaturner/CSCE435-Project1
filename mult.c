@@ -50,8 +50,13 @@ void simple_mult
             SUBMATRIX(A,I,K,b), SUBMATRIX (B,K,J,b), b) ;
     */
 
-    /* TODO */
-
+    for(int i=0; i<n; i++) {
+        for(int j=0; j<n; j++) {
+            for(int k=0; k<n; k++) {
+                C[i][j] = C[i][j] + A[i][k] * B[k][j];
+            }
+        }
+    }
 }
 
 /* C = 0; clear a matrix */
@@ -65,8 +70,11 @@ void clear_matrix
             clear_matrix (SUBMATRIX (C, I, J, b), b) ;
     */
 
-    /* TODO */
-
+    for(int i=0; i<n; i++) {
+        for(int j=0; j<n; j++) {
+            A[i][j] = 0;
+        }
+    }
 }
 
 /* print a matrix */
@@ -97,7 +105,18 @@ void block_mult
 )
 {
     /* no OpenMP pragmas in this function */
-    /* TODO */
+
+    for(int I=0; I<n/blocksize; I++) {
+        for(int J=0; J<n/blocksize; J++) {
+            for(int K=0; K<n/blocksize; K++) {
+                simple_mult(
+                        SUBMATRIX(C,I,J,blocksize),
+                        SUBMATRIX(A,I,K,blocksize),
+                        SUBMATRIX(B,K,J,blocksize),
+                        blocksize);
+            }
+        }
+    }
 }
 
 /* C = A*B, with blocking and parallelism */
@@ -111,8 +130,19 @@ void para_mult
 )
 {
     /* this function uses OpenMP pragma(s) */
-    /* TODO */
 
+    #pragma omp parallel for private(I, J, K) shared(C, A, B) num_threads(20)
+    for(I=0; I<n/b; I++) {
+        for(J=0; J<n/b; J++) {
+            for(K=0; K<n/b; K++) {
+                simple_mult(
+                        SUBMATRIX(C,I,J,b),
+                        SUBMATRIX(A,I,K,b),
+                        SUBMATRIX(B,K,J,b),
+                        b);
+            }
+        }
+    }
 }
 
 
